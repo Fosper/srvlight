@@ -1,0 +1,30 @@
+{
+  "name": "srvlight",
+  "version": "1.0.0",
+  "description": "Quickly and easily NodeJS http(s) and websocket server, with router.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fosper/srvlight.git"
+  },
+  "keywords": [
+    "webserver",
+    "server",
+    "http",
+    "https",
+    "websocket"
+  ],
+  "author": {
+    "name": "Fosper",
+    "email": "fosper@icloud.com",
+    "url": "https://www.npmjs.com/~fosper"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fosper/srvlight/issues"
+  },
+  "homepage": "https://github.com/fosper/srvlight#readme"
+}
