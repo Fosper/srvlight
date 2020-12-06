@@ -1,4 +1,4 @@
-// const fs = require('fs')
+const fs = require('fs')
 const http = require('http')
 const tl = require('toolslight')
 const srvlight = require('../index.js')
