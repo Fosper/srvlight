@@ -55,6 +55,13 @@ srvlight.prototype.httpStart = function() {
         }
 
         let isValidRequest = true
+        // Найден ли роут.
+        if (tl.isEmpty(routePath)) {
+            isValidRequest = false
+            res.writeHead(404)
+            res.end()
+        }
+
         // Допустимый ли метод
         // Допустимый ли протокол (возможно суть с методом одна и та же)
         // Совпадает ли урл
@@ -67,23 +74,26 @@ srvlight.prototype.httpStart = function() {
 
         let request = {
             headers: {},
-            data: '',
-            size: 0
+            headersSize: 0,
+            body: '',
+            bodySize: 0
         }
 
         req.on('data', chunk => {
-            request.size += chunk.length
-            if (request.size > options.max_body_size_bytes) {
+            request.bodySize += chunk.length
+            if (request.bodySize > options.max_body_size_bytes) {
                 isValidRequest = false
                 res.destroy()
             } else {
-                request.data += chunk.toString()
+                request.body += chunk.toString()
             }
         })
         
         req.on('end', () => {
             if (isValidRequest) {
                 request.headers = req.headers
+                request.headersSize = req.headers.length
+
                 server.emit('before', request, res)
                 if (!tl.isEmpty(routePath)) {
                     server.emit(routePath, request, res)
