@@ -62,10 +62,9 @@ srvlight.prototype.wsStart = function() {
         // Найден ли роут.
         if (tl.isEmpty(routePath)) {
             isValidRequest = false
-            res.writeHead(404)
-            res.end()
+            res.close()
         }
-        
+
         // Допустимый ли метод
         // Допустимый ли протокол (возможно суть с методом одна и та же)
         // Совпадает ли урл
