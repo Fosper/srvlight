@@ -8,7 +8,7 @@ srvlight.http = function(customOptions = {}) {
         url: 'any',
         port: 80,
         max_headers_size_bytes: 16384, // default in nodejs is 16384 bytes
-        max_body_size_bytes: 32612, // 1 chunk in nodejs is 32613 bytes
+        bodySizeLimit: 32612, // 1 chunk in nodejs is 32613 bytes
         request_timeout_ms: 10000,
         response_timeout_ms: 10000,
         available_ips: [],
@@ -62,6 +62,13 @@ srvlight.prototype.httpStart = function() {
             res.end()
         }
 
+        // Жив ли сокет
+        if (tl.isEmpty(req.socket.remoteAddress)) {
+            isValidRequest = false
+            res.writeHead(404)
+            res.end()   
+        }
+        
         // Допустимый ли метод
         // Допустимый ли протокол (возможно суть с методом одна и та же)
         // Совпадает ли урл
@@ -76,12 +83,13 @@ srvlight.prototype.httpStart = function() {
             headers: {},
             headersSize: 0,
             body: '',
-            bodySize: 0
+            bodySize: 0,
+            ip: ''
         }
 
         req.on('data', chunk => {
             request.bodySize += chunk.length
-            if (request.bodySize > options.max_body_size_bytes) {
+            if (request.bodySize > options.bodySizeLimit) {
                 isValidRequest = false
                 res.destroy()
             } else {
@@ -92,7 +100,13 @@ srvlight.prototype.httpStart = function() {
         req.on('end', () => {
             if (isValidRequest) {
                 request.headers = req.headers
-                request.headersSize = req.headers.length
+                request.headersSize = JSON.stringify(req.headers).length
+
+                request.ip = req.socket.remoteAddress
+                if (request.ip.includes(':')) {
+                    request.ip = request.ip.split(':')
+                    request.ip = request.ip[request.ip.length - 1]
+                }
 
                 server.emit('before', request, res)
                 if (!tl.isEmpty(routePath)) {

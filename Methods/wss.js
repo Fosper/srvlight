@@ -11,7 +11,7 @@ srvlight.wss = function(customOptions = {}) {
         cert: __dirname + '/SSL/cert.pem',
         key: __dirname + '/SSL/key.pem',
         max_headers_size_bytes: 16384, // default in nodejs is 16384 bytes
-        max_body_size_bytes: 32612, // 1 chunk in nodejs is 32613 bytes
+        bodySizeLimit: 32612, // 1 chunk in nodejs is 32613 bytes
         request_timeout_ms: 10000,
         response_timeout_ms: 10000,
         available_ips: [],
@@ -70,6 +70,13 @@ srvlight.prototype.wssStart = function() {
             res.close()
         }
 
+        // Жив ли сокет
+        if (tl.isEmpty(req.socket.remoteAddress)) {
+            isValidRequest = false
+            res.writeHead(404)
+            res.end()   
+        }
+        
         // Допустимый ли метод
         // Допустимый ли протокол (возможно суть с методом одна и та же)
         // Совпадает ли урл
@@ -84,15 +91,23 @@ srvlight.prototype.wssStart = function() {
             headers: {},
             headersSize: 0,
             body: '',
-            bodySize: 0
+            bodySize: 0,
+            ip: ''
         }
 
         res.on('message', function incoming(body) {
             if (isValidRequest) {
                 request.headers = req.headers
-                request.headersSize = req.headers.length
+                request.headersSize = JSON.stringify(req.headers).length
+
                 request.body = body
                 request.bodySize = body.length
+
+                request.ip = req.socket.remoteAddress
+                if (request.ip.includes(':')) {
+                    request.ip = request.ip.split(':')
+                    request.ip = request.ip[request.ip.length - 1]
+                }
 
                 server.emit('before', request, res)
                 if (!tl.isEmpty(routePath)) {
