@@ -17,7 +17,7 @@ class Srvlight extends events {
             if (option === 'url' || option === 'port' || option === 'cert' || option === 'key') {
                 continue
             }
-            if (!tl.isEmpty(customOptions[option])) {
+            if (customOptions[option] !== undefined) {
                 if (this.options[option] !== customOptions[option]) {
                     options[option] = customOptions[option]
                 }
