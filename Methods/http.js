@@ -13,7 +13,7 @@ srvlight.http = function(customOptions = {}) {
         response_timeout_ms: 10000,
         available_ips: [],
         unavailable_ips: [],
-        available_methods: ['GET','POST','PUT','DELETE']
+        available_methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
     }
 
     for (const customOption of Object.keys(customOptions)) {
@@ -55,18 +55,12 @@ srvlight.prototype.httpStart = function() {
         }
 
         let isValidRequest = true
-        // Найден ли роут.
-        if (tl.isEmpty(routePath)) {
-            isValidRequest = false
-            res.writeHead(404)
-            res.end()
-        }
-
         // Жив ли сокет
         if (tl.isEmpty(req.socket.remoteAddress)) {
             isValidRequest = false
             res.writeHead(404)
-            res.end()   
+            res.end()
+            return
         }
         
         // Допустимый ли метод
@@ -80,11 +74,14 @@ srvlight.prototype.httpStart = function() {
         // Не привышает ли ответ макс. кол-во секунд
 
         let request = {
+            uri: req.url,
+            method: req.method,
             headers: {},
             headersSize: 0,
             body: '',
             bodySize: 0,
-            ip: ''
+            ip: '',
+            finished: req.socket._httpMessage.finished
         }
 
         req.on('data', chunk => {
@@ -108,10 +105,15 @@ srvlight.prototype.httpStart = function() {
                     request.ip = request.ip[request.ip.length - 1]
                 }
 
+                request.finished = req.socket._httpMessage.finished
                 server.emit('before', request, res)
+
+                request.finished = req.socket._httpMessage.finished
                 if (!tl.isEmpty(routePath)) {
                     server.emit(routePath, request, res)
                 }
+
+                request.finished = req.socket._httpMessage.finished
                 server.emit('after', request, res)
             }
         })
