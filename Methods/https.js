@@ -100,9 +100,6 @@ srvlight.prototype.httpsStart = function() {
         })
         
         req.on('end', () => {
-            if (request.uri === '/doRequest?tabId=84&method=POST&fromUrl=https://gql.twitch.tv/gql') {
-                console.log(req)
-            }
             if (isValidRequest) {
                 request.headers = req.headers
                 request.headersSize = JSON.stringify(req.headers).length
@@ -114,15 +111,15 @@ srvlight.prototype.httpsStart = function() {
                 }
                 
                 request.finished = req.socket._httpMessage.finished
-                server.emit('before', request, res)
+                server.emit('before', request, res, req)
 
                 request.finished = req.socket._httpMessage.finished
                 if (!tl.isEmpty(routePath)) {
-                    server.emit(routePath, request, res)
+                    server.emit(routePath, request, res, req)
                 }
 
                 request.finished = req.socket._httpMessage.finished
-                server.emit('after', request, res)
+                server.emit('after', request, res, req)
             }
         })
     }).listen(server.options.port)
