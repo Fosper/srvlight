@@ -86,7 +86,6 @@ srvlight.prototype.httpsStart = function() {
             body: '',
             bodySize: 0,
             ip: '',
-            finished: req.socket._httpMessage.finished
         }
 
         req.on('data', chunk => {
@@ -110,15 +109,16 @@ srvlight.prototype.httpsStart = function() {
                     request.ip = request.ip[request.ip.length - 1]
                 }
                 
-                request.finished = req.socket._httpMessage.finished
                 server.emit('before', request, res, req)
 
-                request.finished = req.socket._httpMessage.finished
                 if (!tl.isEmpty(routePath)) {
                     server.emit(routePath, request, res, req)
+                } else {
+                    res.writeHead(404)
+                    res.end()
+                    return
                 }
 
-                request.finished = req.socket._httpMessage.finished
                 server.emit('after', request, res, req)
             }
         })

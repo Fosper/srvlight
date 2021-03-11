@@ -81,7 +81,6 @@ srvlight.prototype.httpStart = function() {
             body: '',
             bodySize: 0,
             ip: '',
-            finished: req.socket._httpMessage.finished
         }
 
         req.on('data', chunk => {
@@ -105,15 +104,16 @@ srvlight.prototype.httpStart = function() {
                     request.ip = request.ip[request.ip.length - 1]
                 }
 
-                request.finished = req.socket._httpMessage.finished
                 server.emit('before', request, res)
 
-                request.finished = req.socket._httpMessage.finished
                 if (!tl.isEmpty(routePath)) {
                     server.emit(routePath, request, res)
+                } else {
+                    res.writeHead(404)
+                    res.end()
+                    return
                 }
 
-                request.finished = req.socket._httpMessage.finished
                 server.emit('after', request, res)
             }
         })
