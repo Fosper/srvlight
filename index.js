@@ -1,53 +1,71 @@
-const fs = require('fs')
-const events = require('events')
-const tl = require('toolslight')
-
-class Srvlight extends events {
+class Srvlight {
 
     constructor(type, options) {
-        super()
         this.type = type
         this.options = options
+        this.befores = {}
         this.routes = {}
+        this.routeDefaultOptions = {}
     }
 
-    route = (path, callback, customOptions = {}) => {
-        let options = {}
-        for (const option of Object.keys(this.options)) {
-            if (option === 'url' || option === 'port' || option === 'cert' || option === 'key') {
-                continue
-            }
-            if (customOptions[option] !== undefined) {
-                if (this.options[option] !== customOptions[option]) {
-                    options[option] = customOptions[option]
+    before = (routes, callback) => {
+        for (let customOptions of routes) {
+            let defaultOptions = this.routeDefaultOptions
+    
+            let options = {}
+        
+            for (const defaultOption in defaultOptions) {
+                if (typeof(defaultOptions[defaultOption]) === typeof(customOptions[defaultOption])) {
+                    options[defaultOption] = customOptions[defaultOption]
+                } else {
+                    options[defaultOption] = defaultOptions[defaultOption]
                 }
             }
+    
+            if (options.method === '' || options.route === '') {
+                throw new Error('srvlight: incorrect \'before\' function arguments.')
+            }
+    
+            options.callback = callback
+
+            if (this.befores[options.method.toLowerCase() + '#' + options.route] !== undefined) {
+                this.befores[options.method.toLowerCase() + '#' + options.route].push(options)
+            } else {
+                this.befores[options.method.toLowerCase() + '#' + options.route] = [options]
+            }
+        }
+    }
+
+    route = (customOptions = {}, callback) => {
+        let defaultOptions = this.routeDefaultOptions
+    
+        let options = {}
+    
+        for (const defaultOption in defaultOptions) {
+            if (typeof(defaultOptions[defaultOption]) === typeof(customOptions[defaultOption])) {
+                options[defaultOption] = customOptions[defaultOption]
+            } else {
+                options[defaultOption] = defaultOptions[defaultOption]
+            }
         }
 
-        this.on(path, callback)
-
-        this.routes[Object.keys(this.routes).length] = {
-            path: path,
-            options: options
+        if (options.method === '' || options.route === '') {
+            throw new Error('srvlight: incorrect \'route\' function arguments.')
         }
+
+        options.callback = callback
+
+        this.routes[options.method.toLowerCase() + '#' + options.route] = options
     }
 
     start = () => {
         this[this.type + 'Start']()
     }
-
-    before = (callback) => {
-        this.on('before', callback)
-    }
-
-    after = (callback) => {
-        this.on('after', callback)
-    }
 }
 
 module.exports = Srvlight
 
-require('./Methods/http.js')
+// require('./Methods/http.js')
 require('./Methods/https.js')
-require('./Methods/ws.js')
-require('./Methods/wss.js')
+// require('./Methods/ws.js')
+// require('./Methods/wss.js')

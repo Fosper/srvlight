@@ -7,7 +7,7 @@ toolslight.jsonToObject = function(value) {
         Returns object.
 
         Example:
-        .jsonToObject({Name: 'Jack'})
+        .jsonToObject('{Name: 'Jack'}')
     */
 
     try {
