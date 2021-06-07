@@ -65,7 +65,7 @@ class Srvlight {
 
 module.exports = Srvlight
 
-// require('./Methods/http.js')
+require('./Methods/http.js')
 require('./Methods/https.js')
 // require('./Methods/ws.js')
 // require('./Methods/wss.js')
