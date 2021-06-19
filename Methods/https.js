@@ -1,6 +1,6 @@
+const srvlight = require('../index.js')
 const fs = require('fs')
 const https = require('https')
-const srvlight = require('../index.js')
 
 /*
     [Example - short]:
@@ -13,28 +13,18 @@ const srvlight = require('../index.js')
     })
 
     httpsServer.route({
-            method: 'POST', // Default none, must set. Can be GET,POST,PUT,DELETE,OPTIONS,HEAD,PATCH.
+            method: 'POST', // Default none, must set. Can be GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH.
             route: '/test', // Default none, must set.
         }, async (req, res, data) => {
-            console.log('Route: start (after all \'before\').')
-            console.log('Protocol:', data.protocol)
-            console.log('Host:', data.host)
-            console.log('Port:', data.port)
-            console.log('Uri :', data.uri)
-            console.log('Method:', data.method)
-            console.log('Headers:', data.headers)
-            console.log('Headers size:', data.headersSize)
-            console.log('Is body in file:', data.bodyInFile)
-            console.log('Body:', data.body) // If data.bodyInFile is true, data.body = path to file.
+            console.log(data)
+            
             if (!data.bodyInFile) {
                 console.log('Body (string):', Buffer.from(data.body, 'binary').toString())
             }
-            console.log('Body size:', data.bodySize)
-            console.log('Ip:', data.ip)
-
             res.writeHead(200, {
                 'Content-Type': 'text/plain'
             })
+            
             res.end('OK')
         }
     )
@@ -48,86 +38,80 @@ const srvlight = require('../index.js')
     let httpsServer = srvlight.https({
         key: __dirname + '/SSL/key.pem', // Default: none, must set.
         cert: __dirname + '/SSL/cert.pem', // Default: none, must set.
-        urls: [], // Default: [] (empty). If empty - any urls. Can be (example): ['mysite.com', 'www.mysite.com']
+        urls: [], // Default: [] (empty). If empty - clients can make requests to any urls. Can be (example): ['mysite.com', 'www.mysite.com']
         port: 443, // Default: 443.
         connectionLimit: 10, // Default: 0. If 0 - no limit.
         headerSizeLimit: 8192, // Default: 16384 Bytes.
         bodySizeLimit: 10240, // Default: 0 Bytes. If 0 - no limit.
-        requestTimeout: 5000, // Default: 120000 milliseconds.
-        allowedIps: [], // Default: [] (empty). If empty - all IPs allowed.
-        disallowedIps: [], // Default: [] (empty). If empty - didn't block any IP.
+        bodyCache: '', // Default ''. If you need save body to file - select path to any exist folder.
+        requestTimeout: 5000, // Default: 120 000 milliseconds.
+        allowedIps: [], // Default: [] (empty). If empty - all IPs allowed to send requests.
+        disallowedIps: [], // Default: [] (empty). If empty - didn't block any IP to send requests.
         assets: [
             {route: '/assets', dir: __dirname + '/assets'},
             {route: '/assets/images', dir: __dirname + '/assets/bestImages'},
-        ] // Default: [] (empty). For assets folders. dir parameter must be final directory.
+        ], // Default: [] (empty). For assets folders. dir parameter must be final directory.
+        errorsLogFile: __dirname + '/log/errors.log' // Default: ''. If set - all errors will append to this file before throw exception.
     })
+
+    httpsServer.route({
+            method: 'POST', // Default none, must set. Can be GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH.
+            route: '/test', // Default none, must set.
+            bodySizeLimit: 4092, // Default: 0 Bytes. If 0 - no limit.
+            bodyCache: '', // Default ''. If you need save body to file - select path to any exist folder.
+            allowedIps: [], // Default: [] (empty). If empty - all IPs allowed to send requests.
+            disallowedIps: [] // Default: [] (empty). If empty - didn't block any IP to send requests.
+        }, async (req, res, data) => {
+            console.log('I do this finally.')
+
+            console.log(data)
+            if (!data.bodyInFile) {
+                console.log('Body (string):', Buffer.from(data.body, 'binary').toString())
+            }
+
+            res.writeHead(200, {
+                'Content-Type': 'text/plain'
+            })
+            
+            res.end('OK')
+        }
+    )
 
     httpsServer.before([
             {
-                method: 'POST', // Default none, must set. Can be GET,POST,PUT,DELETE,OPTIONS,HEAD,PATCH.
-                route: '/test', // Default none, must set.
-                bodySizeLimit: 4092, // Default: 0 Bytes. If 0 - no limit.
-                allowedIps: [], // Default: [] (empty). If empty - all IPs allowed.
-                disallowedIps: [], // Default: [] (empty). If empty - didn't block any IP.
-                bodyCache: '', // Default ''. If you need save body to file - select path to any exist folder.
+                method: 'POST',
+                route: '/test',
+                bodySizeLimit: 4092,
+                bodyCache: '',
+                allowedIps: [],
+                disallowedIps: []
             }
         ], async (req, res, data) => {
-            console.log('Before: first.')
-            return true // Must return true, for make next 'before' function or route (if it last 'before').
+            console.log('I do this first.')
+            return true // Must return true, for make next 'before' function (if exists) or route.
         }
     )
     
     httpsServer.before([
             {
-                method: 'GET', // Default none, must set. Can be GET,POST,PUT,DELETE,OPTIONS,HEAD,PATCH.
-                route: '/test', // Default none, must set.
-                bodySizeLimit: 4092, // Default: 0 Bytes. If 0 - no limit.
-                allowedIps: [], // Default: [] (empty). If empty - all IPs allowed.
-                disallowedIps: [], // Default: [] (empty). If empty - didn't block any IP.
-                bodyCache: '', // Default ''. If you need save body to file - select path to any exist folder.
+                method: 'POST',
+                route: '/test',
+                bodySizeLimit: 4092,
+                bodyCache: '',
+                allowedIps: [],
+                disallowedIps: []
             },
             {
-                method: 'POST', // Default none, must set. Can be GET,POST,PUT,DELETE,OPTIONS,HEAD,PATCH.
-                route: '/test', // Default none, must set.
-                bodySizeLimit: 4092, // Default: 0 Bytes. If 0 - no limit.
-                allowedIps: [], // Default: [] (empty). If empty - all IPs allowed.
-                disallowedIps: [], // Default: [] (empty). If empty - didn't block any IP.
-                bodyCache: '', // Default ''. If you need save body to file - select path to any exist folder.
+                method: 'POST',
+                route: '/test2', // This route not exists, and function below will be didn't execute.
+                bodySizeLimit: 4092,
+                bodyCache: '',
+                allowedIps: [],
+                disallowedIps: []
             },
         ], async (req, res, data) => {
-            console.log('Before: second.')
-            return true // Must return true, for make next 'before' function or route (if it last 'before').
-        }
-    )
-
-    httpsServer.route({
-            method: 'POST', // Default none, must set. Can be GET,POST,PUT,DELETE,OPTIONS,HEAD,PATCH.
-            route: '/test', // Default none, must set.
-            bodySizeLimit: 4092, // Default: 0 Bytes. If 0 - no limit.
-            allowedIps: [], // Default: [] (empty). If empty - all IPs allowed.
-            disallowedIps: [], // Default: [] (empty). If empty - didn't block any IP.
-            bodyCache: '', // Default ''. If you need save body to file - select path to any exist folder.
-        }, async (req, res, data) => {
-            console.log('Route: start (after all \'before\').')
-            console.log('Protocol:', data.protocol)
-            console.log('Host:', data.host)
-            console.log('Port:', data.port)
-            console.log('Uri :', data.uri)
-            console.log('Method:', data.method)
-            console.log('Headers:', data.headers)
-            console.log('Headers size:', data.headersSize)
-            console.log('Is body in file:', data.bodyInFile)
-            console.log('Body:', data.body) // If data.bodyInFile is true, data.body = path to file.
-            if (!data.bodyInFile) {
-                console.log('Body (string):', Buffer.from(data.body, 'binary').toString())
-            }
-            console.log('Body size:', data.bodySize)
-            console.log('Ip:', data.ip)
-
-            res.writeHead(200, {
-                'Content-Type': 'text/plain'
-            })
-            res.end('OK')
+            console.log('I do this second.')
+            return true // Must return true, for make next 'before' function (if exists) or route.
         }
     )
 
@@ -147,21 +131,30 @@ srvlight.https = function(customOptions = {}) {
         requestTimeout: 120000,
         allowedIps: [],
         disallowedIps: [],
-        assets: []
+        assets: [],
+        errorsLogFile: ''
     }
 
     let options = {}
 
     for (const defaultOption in defaultOptions) {
-        if (typeof(defaultOptions[defaultOption]) === typeof(customOptions[defaultOption])) {
+        if (Object.prototype.toString.call(defaultOptions[defaultOption]) === Object.prototype.toString.call(customOptions[defaultOption])) {
             options[defaultOption] = customOptions[defaultOption]
         } else {
             options[defaultOption] = defaultOptions[defaultOption]
         }
     }
 
-    if (options.key === '' || options.sert === '') {
-        throw new Error('srvlight: incorrect \'https\' function arguments (\'key\' or/and \'sert\' arguments didn\'t set).')
+    if (options.key === '' || options.cert === '') {
+        let fullError = 'srvlight: incorrect \'https\' function arguments (\'key\' or/and \'cert\' arguments didn\'t set).'
+        if (options.errorsLogFile !== '') {
+            try {
+                fs.appendFileSync(options.errorsLogFile, fullError)
+            } catch (error) {
+                throw new Error('srvlight: incorrect \'https\' function arguments (\'errorsLogFile\' argument incorrect. Check it and be sure, that folder and file ' + options.errorsLogFile + ' is exists).')
+            }
+        }
+        throw new Error(fullError)
     }
 
     let self = new this('https', options)
@@ -188,7 +181,19 @@ srvlight.prototype.httpsStart = function() {
         switch (option) {
             case 'key':
             case 'cert':
-                serverOptions[option] = fs.readFileSync(server.options[option])
+                try {
+                    serverOptions[option] = fs.readFileSync(server.options[option])
+                } catch (error) {
+                    let fullError = 'srvlight: incorrect \'https\' function arguments (files in \'key\' or/and \'cert\' arguments don\'t exists).'
+                    if (server.options.errorsLogFile !== '') {
+                        try {
+                            fs.appendFileSync(server.options.errorsLogFile, fullError)
+                        } catch (error) {
+                            throw new Error('srvlight: incorrect \'https\' function arguments (\'errorsLogFile\' argument incorrect. Check it and be sure, that folder and file ' + server.options.errorsLogFile + ' is exists).')
+                        }
+                    }
+                    throw new Error(fullError)
+                }
                 break;
             case 'headerSizeLimit':
                 if (server.options[option] > 0) {
@@ -267,15 +272,15 @@ srvlight.prototype.httpsStart = function() {
                     for (let asset of options.assets) {
                         if (asset.route === assetRoute) {
                             isAssetRequest = true
-                            fs.access(asset.dir + '/' + filename, fs.F_OK, (err) => {
-                                if (err) {
-                                    res.writeHead(404)
-                                    res.end()
-                                    return
-                                }
+                            try {
+                                await fs.promises.access(asset.dir + '/' + filename)
                                 res.writeHead(200)
                                 fs.createReadStream(asset.dir + '/' + filename).pipe(res)
-                            })
+                            } catch (error) {
+                                res.writeHead(404)
+                                res.end()
+                                return
+                            }
                             break
                         }
                     }
@@ -287,26 +292,42 @@ srvlight.prototype.httpsStart = function() {
             return
         }
 
-        let incomeRoute = data.uri.split('?')[0]
-        let functions = []
-        let bodySizeLimit = 0
-        let bodyCache = ''
+        let routePath = data.uri.split('?')[0]
+        let routeFunctions = []
+        let routeBodySizeLimit = 0
+        let routeBodyCache = ''
+        let routeAllowedIps = []
+        let routeDisallowedIps = []
 
         for (const before in server.befores) {
-            if (data.method.toLowerCase() + '#' + incomeRoute === before) {
-                for (let route of server.befores[data.method.toLowerCase() + '#' + incomeRoute]) {
-                    functions.push(route)
+            if (data.method.toLowerCase() + '#' + routePath === before) {
+                for (let route of server.befores[data.method.toLowerCase() + '#' + routePath]) {
+                    routeFunctions.push(route)
                     if (route.bodySizeLimit !== 0) {
-                        if (bodySizeLimit === 0) {
-                            bodySizeLimit = route.bodySizeLimit
+                        if (routeBodySizeLimit === 0) {
+                            routeBodySizeLimit = route.bodySizeLimit
                         } else {
-                            if (route.bodySizeLimit < bodySizeLimit) {
-                                bodySizeLimit = route.bodySizeLimit
+                            if (route.bodySizeLimit < routeBodySizeLimit) {
+                                routeBodySizeLimit = route.bodySizeLimit
                             }
                         }
                     }
-                    if (route.bodyCache !== '' && bodyCache === '') {
-                        bodyCache = route.bodyCache
+                    if (route.bodyCache !== '' && routeBodyCache === '') {
+                        routeBodyCache = route.bodyCache
+                    }
+                    if (route.allowedIps.length > 0) {
+                        for (let allowedIp of route.allowedIps) {
+                            if (!routeAllowedIps.includes(allowedIp)) {
+                                routeAllowedIps.push(allowedIp)
+                            }
+                        }
+                    }
+                    if (route.disallowedIps.length > 0) {
+                        for (let disallowedIp of route.disallowedIps) {
+                            if (!routeDisallowedIps.includes(disallowedIp)) {
+                                routeDisallowedIps.push(disallowedIp)
+                            }
+                        }
                     }
                 }
                 break
@@ -314,38 +335,70 @@ srvlight.prototype.httpsStart = function() {
         }
 
         for (const route in server.routes) {
-            if (data.method.toLowerCase() + '#' + incomeRoute === route) {
-                functions.push(server.routes[route])
+            if (data.method.toLowerCase() + '#' + routePath === route) {
+                routeFunctions.push(server.routes[route])
                 if (server.routes[route].bodySizeLimit !== 0) {
-                    if (bodySizeLimit === 0) {
-                        bodySizeLimit = server.routes[route].bodySizeLimit
+                    if (routeBodySizeLimit === 0) {
+                        routeBodySizeLimit = server.routes[route].bodySizeLimit
                     } else {
-                        if (server.routes[route].bodySizeLimit < bodySizeLimit) {
-                            bodySizeLimit = server.routes[route].bodySizeLimit
+                        if (server.routes[route].bodySizeLimit < routeBodySizeLimit) {
+                            routeBodySizeLimit = server.routes[route].bodySizeLimit
                         }
                     }
                 }
-                if (server.routes[route].bodyCache !== '' && bodyCache === '') {
-                    bodyCache = server.routes[route].bodyCache
+                if (server.routes[route].bodyCache !== '' && routeBodyCache === '') {
+                    routeBodyCache = server.routes[route].bodyCache
+                }
+                if (server.routes[route].allowedIps.length > 0) {
+                    for (let allowedIp of server.routes[route].allowedIps) {
+                        if (!routeAllowedIps.includes(allowedIp)) {
+                            routeAllowedIps.push(allowedIp)
+                        }
+                    }
+                }
+                if (server.routes[route].disallowedIps.length > 0) {
+                    for (let disallowedIp of server.routes[route].disallowedIps) {
+                        if (!routeDisallowedIps.includes(disallowedIp)) {
+                            routeDisallowedIps.push(disallowedIp)
+                        }
+                    }
                 }
                 break
             }
         }
 
-        if (!functions.length) {
+        if (!routeFunctions.length) {
             res.writeHead(404)
             res.end()
             return
         }
 
-        if (bodyCache !== '') {
+        if (routeDisallowedIps.includes(data.ip)) {
+            res.writeHead(404)
+            res.end()
+            return
+        }
+
+        if (routeAllowedIps.length > 0) {
+            if (!routeAllowedIps.includes(data.ip)) {
+                res.writeHead(404)
+                res.end()
+                return
+            }
+        }
+
+        if (routeBodyCache === '') {
+            routeBodyCache = server.options.bodyCache
+        }
+
+        if (routeBodyCache !== '') {
             let lib = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
             let bodyCacheFileName = ''
             for (let i = 0; i < 20; i++) {
                 bodyCacheFileName += lib[Math.floor(Math.random() * ((lib.length - 1) - 0 + 1) + 0)]
             }
             data.bodyInFile = true
-            data.body = bodyCache + '/' + bodyCacheFileName
+            data.body = routeBodyCache + '/' + bodyCacheFileName
         }
 
         if (!data.bodyInFile) {
@@ -354,15 +407,23 @@ srvlight.prototype.httpsStart = function() {
 
         req.on('data', chunk => {
             data.bodySize += chunk.length
-            if (data.bodySize > bodySizeLimit && bodySizeLimit !== 0) {
+            if (data.bodySize > routeBodySizeLimit && routeBodySizeLimit !== 0) {
                 res.destroy()
             } else {
-                if (bodyCache !== '') {
-                    fs.appendFile(data.body, Buffer.from(chunk, 'binary'), {encoding: 'binary'}, function (err) {
-                        if (err) {
-                            throw new Error('srvlight: incorrect \'route\' of \'before\' function arguments (\'bodyCache\' argument incorrect. Check it and be sure, that folder ' + server.options.bodyCache + ' is exists).')
+                if (routeBodyCache !== '') {
+                    try {
+                        fs.appendFileSync(data.body, Buffer.from(chunk, 'binary'), {encoding: 'binary'})
+                    } catch (error) {
+                        let fullError = 'srvlight: incorrect \'https\' or \'route\' of \'before\' function arguments (\'bodyCache\' argument incorrect. Check it and be sure, that folder and file ' + routeBodyCache + ' is exists).'
+                        if (server.options.errorsLogFile !== '') {
+                            try {
+                                fs.appendFileSync(server.options.errorsLogFile, fullError)
+                            } catch (error) {
+                                throw new Error('srvlight: incorrect \'https\' function arguments (\'errorsLogFile\' argument incorrect. Check it and be sure, that folder and file ' + server.options.errorsLogFile + ' is exists).')
+                            }
                         }
-                    })
+                        throw new Error(fullError)
+                    }
                 } else {
                     data.body.push(Buffer.from(chunk, 'binary'))
                 }
@@ -393,18 +454,20 @@ srvlight.prototype.httpsStart = function() {
         }
 
         req.on('end', async () => {
-            data.headers = req.headers
-            data.headersSize = JSON.stringify(req.headers).length
-            if (!data.bodyInFile) {
-                data.body = Buffer.concat(data.body)
-            }
-
-            let generate = generator(functions, req, res, data)
-
-            for (let func of functions) {
-                let result = await generate.next()
-                if (result.done) {
-                    break
+            if (data.bodySize <= routeBodySizeLimit || routeBodySizeLimit === 0) {
+                data.headers = req.headers
+                data.headersSize = JSON.stringify(req.headers).length
+                if (!data.bodyInFile) {
+                    data.body = Buffer.concat(data.body)
+                }
+    
+                let generate = generator(routeFunctions, req, res, data)
+    
+                for (let routeFunction of routeFunctions) {
+                    let result = await generate.next()
+                    if (result.done) {
+                        break
+                    }
                 }
             }
         })

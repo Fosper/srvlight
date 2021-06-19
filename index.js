@@ -13,9 +13,9 @@ class Srvlight {
             let defaultOptions = this.routeDefaultOptions
     
             let options = {}
-        
+
             for (const defaultOption in defaultOptions) {
-                if (typeof(defaultOptions[defaultOption]) === typeof(customOptions[defaultOption])) {
+                if (Object.prototype.toString.call(defaultOptions[defaultOption]) === Object.prototype.toString.call(customOptions[defaultOption])) {
                     options[defaultOption] = customOptions[defaultOption]
                 } else {
                     options[defaultOption] = defaultOptions[defaultOption]
@@ -23,7 +23,15 @@ class Srvlight {
             }
     
             if (options.method === '' || options.route === '') {
-                throw new Error('srvlight: incorrect \'before\' function arguments.')
+                let fullError = 'srvlight: incorrect \'before\' function arguments (\'method\' or \'route\' argument incorrect).'
+                if (this.options.errorsLogFile !== '') {
+                    try {
+                        fs.appendFileSync(this.options.errorsLogFile, fullError)
+                    } catch (error) {
+                        throw new Error('srvlight: incorrect \'http\' or \'https\' function arguments (\'errorsLogFile\' argument incorrect. Check it and be sure, that folder and file ' + this.options.errorsLogFile + ' is exists).')
+                    }
+                }
+                throw new Error(fullError)
             }
     
             options.callback = callback
@@ -42,7 +50,7 @@ class Srvlight {
         let options = {}
     
         for (const defaultOption in defaultOptions) {
-            if (typeof(defaultOptions[defaultOption]) === typeof(customOptions[defaultOption])) {
+            if (Object.prototype.toString.call(defaultOptions[defaultOption]) === Object.prototype.toString.call(customOptions[defaultOption])) {
                 options[defaultOption] = customOptions[defaultOption]
             } else {
                 options[defaultOption] = defaultOptions[defaultOption]
@@ -50,7 +58,15 @@ class Srvlight {
         }
 
         if (options.method === '' || options.route === '') {
-            throw new Error('srvlight: incorrect \'route\' function arguments.')
+            let fullError = 'srvlight: incorrect \'route\' function arguments (\'method\' or \'route\' argument incorrect).'
+            if (this.options.errorsLogFile !== '') {
+                try {
+                    fs.appendFileSync(this.options.errorsLogFile, fullError)
+                } catch (error) {
+                    throw new Error('srvlight: incorrect \'http\' or \'https\' function arguments (\'errorsLogFile\' argument incorrect. Check it and be sure, that folder and file ' + this.options.errorsLogFile + ' is exists).')
+                }
+            }
+            throw new Error(fullError)
         }
 
         options.callback = callback
@@ -67,5 +83,3 @@ module.exports = Srvlight
 
 require('./Methods/http.js')
 require('./Methods/https.js')
-// require('./Methods/ws.js')
-// require('./Methods/wss.js')
