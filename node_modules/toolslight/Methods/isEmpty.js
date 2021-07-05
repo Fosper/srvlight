@@ -28,24 +28,24 @@ toolslight.isEmpty = function(value) {
 
     if (value) {
         if (typeof value === 'number' || typeof value === 'function') {
-        result = false
+            result = false
         } else if (typeof value === 'string') {
-        if (value !== '0' && value !== 'false' && value !== 'null' && value !== 'undefined') {
-            result = false
-        }
-        } else if (typeof value === 'object') {
-        if (value !== null) {
-            for(let key in value) {
-            if(value.hasOwnProperty(key)) {
+            if (value !== '0' && value !== 'false' && value !== 'null' && value !== 'undefined') {
                 result = false
-                break
             }
+        } else if (typeof value === 'object') {
+            if (value !== null) {
+                for(let key in value) {
+                if(value.hasOwnProperty(key)) {
+                    result = false
+                    break
+                }
+                }
             }
-        }
         } else if (typeof value === 'symbol') {
-        if (value.description) {
-            result = false
-        }
+            if (value.description) {
+                result = false
+            }
         }
     }
 

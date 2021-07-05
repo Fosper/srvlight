@@ -38,9 +38,8 @@ toolslight.to = function(promise) {
     */
 
     return promise.then(data => {
-        return [null, data];
-        })
-    .catch(err => [err]);
+        return [null, data]
+    }).catch(err => [err])
 }
 
 
