@@ -1,6 +1,6 @@
 {
   "name": "srvlight",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Quickly and easily NodeJS http(s) and websocket server, with router.",
   "main": "index.js",
   "scripts": {
