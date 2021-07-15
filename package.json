@@ -26,9 +26,5 @@
   "bugs": {
     "url": "https://github.com/fosper/srvlight/issues"
   },
-  "homepage": "https://github.com/fosper/srvlight#readme",
-  "dependencies": {
-    "toolslight": "^1.0.3",
-    "ws": "^7.4.0"
-  }
+  "homepage": "https://github.com/fosper/srvlight#readme"
 }
