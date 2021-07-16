@@ -420,7 +420,10 @@ srvlight.prototype.httpStart = function() {
         req.on('end', async () => {
             if (data.bodySize <= routeBodySizeLimit || routeBodySizeLimit === 0) {
                 data.headers = req.headers
-                data.headersSize = JSON.stringify(req.headers).length
+                for (const headerName in req.headers) {
+                    data.headersSize += headerName.length + req.headers[headerName].length + 4
+                }
+                
                 if (!data.bodyInFile) {
                     data.body = Buffer.concat(data.body)
                 }
