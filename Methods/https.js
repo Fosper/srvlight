@@ -13,8 +13,8 @@ const https = require('https')
     })
 
     httpsServer.route({
-            method: 'POST', // Default none, must set. Can be GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH.
-            route: '/test', // Default none, must set.
+            methods: ['POST'], // Default none, must set. Can be GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH.
+            routes: ['/test'], // Default none, must set.
         }, async (req, res, data) => {
             console.log(data)
             
@@ -55,8 +55,8 @@ const https = require('https')
     })
 
     httpsServer.route({
-            method: 'POST', // Default none, must set. Can be GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH.
-            route: '/test', // Default none, must set.
+            methods: ['POST'], // Default none, must set. Can be GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH.
+            routes: ['/test'], // Default none, must set.
             bodySizeLimit: 4092, // Default: 0 Bytes. If 0 - no limit.
             bodyCache: '', // Default ''. If you need save body to file - select path to any exist folder.
             allowedIps: [], // Default: [] (empty). If empty - all IPs allowed to send requests.
@@ -79,8 +79,8 @@ const https = require('https')
 
     httpsServer.before([
             {
-                method: 'POST',
-                route: '/test',
+                methods: ['POST'],
+                routes: ['/test'],
                 bodySizeLimit: 4092,
                 bodyCache: '',
                 allowedIps: [],
@@ -94,16 +94,16 @@ const https = require('https')
     
     httpsServer.before([
             {
-                method: 'POST',
-                route: '/test',
+                methods: ['POST'],
+                routes: ['/test'],
                 bodySizeLimit: 4092,
                 bodyCache: '',
                 allowedIps: [],
                 disallowedIps: []
             },
             {
-                method: 'POST',
-                route: '/test2', // This route not exists, and function below will be didn't execute.
+                methods: ['POST'],
+                routes: ['/test2'], // This route not exists, and function below will be didn't execute.
                 bodySizeLimit: 4092,
                 bodyCache: '',
                 allowedIps: [],
@@ -160,8 +160,8 @@ srvlight.https = function(customOptions = {}) {
     let self = new this('https', options)
 
     self.routeDefaultOptions = {
-        method: '',
-        route: '',
+        methods: [],
+        routes: [],
         bodySizeLimit: options.bodySizeLimit,
         bodyCache: '',
         allowedIps: options.allowedIps,
@@ -221,11 +221,11 @@ srvlight.prototype.httpsStart = function() {
         }
 
         let data = {
+            method: req.method,
             protocol: 'https',
             host: req.headers['host'],
             port: server.options.port,
             uri: req.url,
-            method: req.method,
             headers: [],
             headersSize: 0,
             bodyInFile: false,
@@ -300,8 +300,25 @@ srvlight.prototype.httpsStart = function() {
         let routeDisallowedIps = []
 
         for (const before in server.befores) {
-            if (data.method.toLowerCase() + '#' + routePath === before) {
-                for (let route of server.befores[data.method.toLowerCase() + '#' + routePath]) {
+            if (data.method.toLowerCase() + '#' + routePath === before || (data.method.toLowerCase() + '#*' === before || data.method.toLowerCase() + '#/*' === before)) {
+                let iterables = []
+
+                if (data.method.toLowerCase() + '#' + routePath === before) {
+                    iterables = server.befores[data.method.toLowerCase() + '#' + routePath]
+                } else {
+                    if (Object.prototype.toString.call(server.befores[data.method.toLowerCase() + '#*']) === '[object Array]') {
+                        for (let iterable of server.befores[data.method.toLowerCase() + '#*']) {
+                            iterables.push(iterable)
+                        }
+                    }
+                    if (Object.prototype.toString.call(server.befores[data.method.toLowerCase() + '#/*']) === '[object Array]') {
+                        for (let iterable of server.befores[data.method.toLowerCase() + '#/*']) {
+                            iterables.push(iterable)
+                        }
+                    }
+                }
+
+                for (let route of iterables) {
                     routeFunctions.push(route)
                     if (route.bodySizeLimit !== 0) {
                         if (routeBodySizeLimit === 0) {
@@ -335,7 +352,7 @@ srvlight.prototype.httpsStart = function() {
         }
 
         for (const route in server.routes) {
-            if (data.method.toLowerCase() + '#' + routePath === route) {
+            if (data.method.toLowerCase() + '#' + routePath === route || (data.method.toLowerCase() + '#*' === route || data.method.toLowerCase() + '#/*' === route)) {
                 routeFunctions.push(server.routes[route])
                 if (server.routes[route].bodySizeLimit !== 0) {
                     if (routeBodySizeLimit === 0) {
