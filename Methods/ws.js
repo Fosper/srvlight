@@ -15,19 +15,16 @@ const http = require('http')
         }, async (req, res, data) => {
             res.send('Server: connection to route success.')
 
-            console.log(data)
-            if (!data.bodyInFile) {
-                console.log('Body (string):', Buffer.from(data.body, 'binary').toString())
-            }
-
-            res.send('Server: hello!')
+            res.on('message', async (body) => {
+                console.log(Buffer.from(body, 'binary').toString())
+            })
 
             setTimeout(() => {
                 res.close()
             }, 10000)
         }
     )
-
+    
     wsServer.start()
 */
 
@@ -37,7 +34,6 @@ srvlight.ws = function(customOptions = {}) {
         port: 88,
         connectionLimit: 0,
         headerSizeLimit: 16384,
-        bodySizeLimit: 0,
         requestTimeout: 5000,
         allowedIps: [],
         disallowedIps: [],
@@ -115,7 +111,6 @@ srvlight.prototype.wsStart = function() {
             uri: req.url,
             headers: req.headers,
             headersSize: 0,
-            body: '',
             ip: req.socket.remoteAddress.includes(':') ? req.socket.remoteAddress.split(':')[req.socket.remoteAddress.split(':').length - 1] : req.socket.remoteAddress
         }
 
@@ -265,23 +260,14 @@ srvlight.prototype.wsStart = function() {
             }
         }
 
-        res.on('message', async (body) => {
-            if (Buffer.byteLength(body) > routeBodySizeLimit && routeBodySizeLimit !== 0) {
-                res.close()
-                return
-            }
+        let generate = generator(routeFunctions, req, res, data)
 
-            data.body = body
-    
-            let generate = generator(routeFunctions, req, res, data)
-
-            for (let routeFunction of routeFunctions) {
-                let result = await generate.next()
-                if (result.done) {
-                    break
-                }
+        for (let routeFunction of routeFunctions) {
+            let result = await generate.next()
+            if (result.done) {
+                break
             }
-        })
+        }
     })
 
     webServer.listen(server.options.port)
