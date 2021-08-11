@@ -9,12 +9,12 @@ const https = require('https')
 
     let httpsServer = srvlight.https({
         key: __dirname + '/SSL/key.pem', // Default: none, must set.
-        cert: __dirname + '/SSL/cert.pem', // Default: none, must set.
+        cert: __dirname + '/SSL/cert.pem' // Default: none, must set.
     })
 
     httpsServer.route({
             methods: ['POST'], // Default none, must set. Can be GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH.
-            routes: ['/test'], // Default none, must set.
+            routes: ['/test'] // Default none, must set.
         }, async (req, res, data) => {
             console.log(data)
             
@@ -108,7 +108,7 @@ const https = require('https')
                 bodyCache: '',
                 allowedIps: [],
                 disallowedIps: []
-            },
+            }
         ], async (req, res, data) => {
             console.log('I do this second.')
             return true // Must return true, for make next 'before' function (if exists) or route.
@@ -166,7 +166,7 @@ srvlight.https = function(customOptions = {}) {
         bodyCache: '',
         allowedIps: options.allowedIps,
         disallowedIps: options.disallowedIps,
-        callback: async (req, res, data) => {return true}
+        callback: async (req, res, data) => { return true }
     }
 
     return self
@@ -222,9 +222,7 @@ srvlight.prototype.httpsStart = function() {
 
         let data = {
             method: req.method,
-            protocol: 'https',
             host: req.headers['host'],
-            port: server.options.port,
             uri: req.url,
             headers: [],
             headersSize: 0,

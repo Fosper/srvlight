@@ -140,12 +140,13 @@ class Srvlight {
             'DELETE', 
             'OPTIONS', 
             'HEAD', 
-            'PATCH'
+            'PATCH',
+            'CONNECT'
         ]
 
         for (let method of options.methods) {
             if (!availableMethods.includes(method)) {
-                let fullError = 'srvlight: incorrect \'route\' function arguments (\'methods\' argument must contain only strings values, and values can\'t be empty. Available values: \'GET\', \'POST\', \'PUT\', \'DELETE\', \'OPTIONS\', \'HEAD\', \'PATCH\').'
+                let fullError = 'srvlight: incorrect \'methods\' function arguments (\'methods\' argument must contain only strings values, and values can\'t be empty. Available values: \'GET\', \'POST\', \'PUT\', \'DELETE\', \'OPTIONS\', \'HEAD\', \'PATCH\').'
                 if (this.options.errorsLogFile !== '') {
                     try {
                         fs.appendFileSync(this.options.errorsLogFile, fullError)
@@ -211,3 +212,5 @@ module.exports = Srvlight
 
 require('./Methods/http.js')
 require('./Methods/https.js')
+require('./Methods/ws.js')
+require('./Methods/wss.js')

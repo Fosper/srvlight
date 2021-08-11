@@ -11,7 +11,7 @@ const http = require('http')
 
     httpServer.route({
             methods: ['POST'], // Default none, must set. Can be GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH.
-            routes: ['/test'], // Default none, must set.
+            routes: ['/test'] // Default none, must set.
         }, async (req, res, data) => {
             console.log(data)
 
@@ -104,7 +104,7 @@ const http = require('http')
                 bodyCache: '',
                 allowedIps: [],
                 disallowedIps: []
-            },
+            }
         ], async (req, res, data) => {
             console.log('I do this second.')
             return true // Must return true, for make next 'before' function (if exists) or route.
@@ -148,7 +148,7 @@ srvlight.http = function(customOptions = {}) {
         bodyCache: '',
         allowedIps: options.allowedIps,
         disallowedIps: options.disallowedIps,
-        callback: async (req, res, data) => {return true}
+        callback: async (req, res, data) => { return true }
     }
 
     return self
@@ -185,11 +185,9 @@ srvlight.prototype.httpStart = function() {
         }
 
         let data = {
-            protocol: 'http',
-            host: req.headers['host'],
-            port: server.options.port,
-            uri: req.url,
             method: req.method,
+            host: req.headers['host'],
+            uri: req.url,
             headers: [],
             headersSize: 0,
             bodyInFile: false,

@@ -26,5 +26,8 @@
   "bugs": {
     "url": "https://github.com/fosper/srvlight/issues"
   },
-  "homepage": "https://github.com/fosper/srvlight#readme"
+  "homepage": "https://github.com/fosper/srvlight#readme",
+  "dependencies": {
+    "ws": "^8.0.0"
+  }
 }
