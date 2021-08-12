@@ -34,7 +34,7 @@ srvlight.ws = function(customOptions = {}) {
         port: 88,
         connectionLimit: 0,
         headerSizeLimit: 16384,
-        requestTimeout: 5000,
+        requestTimeout: 0, // It's global timeout, after this time connection will be close.
         allowedIps: [],
         disallowedIps: [],
         errorsLogFile: ''
