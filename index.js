@@ -41,7 +41,8 @@ class Srvlight {
                 'DELETE', 
                 'OPTIONS', 
                 'HEAD', 
-                'PATCH'
+                'PATCH',
+                'CONNECT'
             ]
     
             for (let method of options.methods) {
