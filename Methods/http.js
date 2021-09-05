@@ -225,12 +225,9 @@ srvlight.prototype.httpStart = function() {
             if (regexResult[0] !== undefined) {
                 if (regexResult[0][0] !== undefined) {
                     filename = regexResult[0][0]
-                    let assetRoute = data.uri.split('/')
-                    if (assetRoute.length >= 2) {
-                        assetRoute = '/' + assetRoute[1]
-                    } else {
-                        assetRoute = '/'
-                    }
+                    let assetRoute = data.uri.split('/').slice(1)
+                    assetRoute = assetRoute.slice(0, assetRoute.length - 1)
+                    assetRoute = '/' + assetRoute.join('/')
                     for (let asset of options.assets) {
                         if (asset.route === assetRoute) {
                             isAssetRequest = true

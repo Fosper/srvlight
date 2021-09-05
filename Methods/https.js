@@ -44,7 +44,7 @@ const https = require('https')
         headerSizeLimit: 8192, // Default: 16384 Bytes.
         bodySizeLimit: 10240, // Default: 0 Bytes. If 0 - no limit.
         bodyCache: '', // Default ''. If you need save body to file - select path to any exist folder.
-        requestTimeout: 5000, // Default: 120 000 milliseconds.
+        requestTimeout: 5000, // Default: 120 000 milliseconds. If 0 - no limit.
         allowedIps: [], // Default: [] (empty). If empty - all IPs allowed to send requests.
         disallowedIps: [], // Default: [] (empty). If empty - didn't block any IP to send requests.
         assets: [
@@ -261,12 +261,9 @@ srvlight.prototype.httpsStart = function() {
             if (regexResult[0] !== undefined) {
                 if (regexResult[0][0] !== undefined) {
                     filename = regexResult[0][0]
-                    let assetRoute = data.uri.split('/')
-                    if (assetRoute.length >= 2) {
-                        assetRoute = '/' + assetRoute[1]
-                    } else {
-                        assetRoute = '/'
-                    }
+                    let assetRoute = data.uri.split('/').slice(1)
+                    assetRoute = assetRoute.slice(0, assetRoute.length - 1)
+                    assetRoute = '/' + assetRoute.join('/')
                     for (let asset of options.assets) {
                         if (asset.route === assetRoute) {
                             isAssetRequest = true
