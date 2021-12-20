@@ -228,6 +228,7 @@ srvlight.prototype.httpStart = function() {
                     let assetRoute = data.uri.split('/').slice(1)
                     assetRoute = assetRoute.slice(0, assetRoute.length - 1)
                     assetRoute = '/' + assetRoute.join('/')
+
                     for (let asset of options.assets) {
                         if (asset.route === assetRoute) {
                             isAssetRequest = true
@@ -237,7 +238,7 @@ srvlight.prototype.httpStart = function() {
                                 if (filename.includes('.svg')) {
                                     headers['Content-Type'] = 'image/svg+xml'
                                 }
-                                res.writeHead(200)
+                                res.writeHead(200, headers)
                                 fs.createReadStream(asset.dir + '/' + filename).pipe(res)
                             } catch (error) {
                                 res.writeHead(404)
