@@ -257,7 +257,7 @@ srvlight.prototype.httpsStart = function() {
         let isAssetRequest = false
         if (data.method === 'GET' && data.uri.includes('.')) {
             let filename = data.uri.split('/')[data.uri.split('/').length - 1]
-            let regexResult = Array.from(filename.matchAll(/([a-zA-Z0-9\_\,\.]+)/g))
+            let regexResult = Array.from(filename.matchAll(/([a-zA-Z0-9-~:@\_\,\.]+)/g))
             if (regexResult[0] !== undefined) {
                 if (regexResult[0][0] !== undefined) {
                     filename = regexResult[0][0]
@@ -269,6 +269,10 @@ srvlight.prototype.httpsStart = function() {
                             isAssetRequest = true
                             try {
                                 await fs.promises.access(asset.dir + '/' + filename)
+                                let headers = {}
+                                if (filename.includes('.svg')) {
+                                    headers['Content-Type'] = 'image/svg+xml'
+                                }
                                 res.writeHead(200)
                                 fs.createReadStream(asset.dir + '/' + filename).pipe(res)
                             } catch (error) {
