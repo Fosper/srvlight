@@ -232,6 +232,8 @@ srvlight.prototype.httpsStart = function() {
             ip: req.socket.remoteAddress.includes(':') ? req.socket.remoteAddress.split(':')[req.socket.remoteAddress.split(':').length - 1] : req.socket.remoteAddress
         }
 
+        if (req.headers['cf-connecting-ip']) data.ip = req.headers['cf-connecting-ip']
+
         if (options.urls.length > 0 && data.host !== undefined) {
             if (!options.urls.includes(data.host)) {
                 res.writeHead(404)

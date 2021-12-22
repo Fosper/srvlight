@@ -114,6 +114,8 @@ srvlight.prototype.wsStart = function() {
             ip: req.socket.remoteAddress.includes(':') ? req.socket.remoteAddress.split(':')[req.socket.remoteAddress.split(':').length - 1] : req.socket.remoteAddress
         }
 
+        if (req.headers['cf-connecting-ip']) data.ip = req.headers['cf-connecting-ip']
+
         for (const headerName in req.headers) {
             data.headersSize += headerName.length + req.headers[headerName].length + 4
         }
