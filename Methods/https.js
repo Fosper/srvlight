@@ -1,6 +1,7 @@
 const srvlight = require('../index.js')
 const fs = require('fs')
 const https = require('https')
+const { constants } = require('crypto')
 
 /*
     [Example - short]:
@@ -175,7 +176,9 @@ srvlight.https = function(customOptions = {}) {
 srvlight.prototype.httpsStart = function() {
     let server = this
 
-    let serverOptions = {}
+    let serverOptions = {
+        secureOptions: constants.SSL_OP_NO_SSLv2 | constants.SSL_OP_NO_SSLv3 | constants.SSL_OP_NO_TLSv1 | constants.SSL_OP_NO_TLSv1_1 | constants.SSL_OP_NO_TLSv1_2
+    }
 
     for (const option in server.options) {
         switch (option) {
