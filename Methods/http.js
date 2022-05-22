@@ -171,6 +171,8 @@ srvlight.prototype.httpStart = function() {
         }
     }
 
+    let data = {}
+
     let webServer = http.createServer(serverOptions, async (req, res) => {
         let options = {}
 
@@ -184,18 +186,17 @@ srvlight.prototype.httpStart = function() {
             }
         }
 
-        let data = {
-            method: req.method,
-            host: req.headers['host'],
-            uri: req.url,
-            headers: [],
-            headersSize: 0,
-            bodyInFile: false,
-            body: '',
-            bodySize: 0,
-            ip: req.socket.remoteAddress.includes(':') ? req.socket.remoteAddress.split(':')[req.socket.remoteAddress.split(':').length - 1] : req.socket.remoteAddress,
-            ts: Date.now()
-        }
+        data.method = req.method
+        data.host = req.headers['host']
+        data.uri = req.url
+        data.headers = []
+        data.headersSize = 0
+        data.bodyInFile = false
+        data.body = ''
+        data.bodySize = 0
+        data.ip = req.socket.remoteAddress.includes(':') ? req.socket.remoteAddress.split(':')[req.socket.remoteAddress.split(':').length - 1] : req.socket.remoteAddress
+        data.startTs = Date.now()
+        data.endTs = 0
 
         if (req.headers['cf-connecting-ip']) data.ip = req.headers['cf-connecting-ip']
 
@@ -438,6 +439,7 @@ srvlight.prototype.httpStart = function() {
         }
 
         req.on('end', async () => {
+            data.endTs = Date.now()
             if (data.bodySize <= routeBodySizeLimit || routeBodySizeLimit === 0) {
                 data.headers = req.headers
                 for (const headerName in req.headers) {

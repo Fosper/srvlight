@@ -93,6 +93,8 @@ srvlight.prototype.wsStart = function() {
 
     let websocketServer = new websocket.Server({ server: webServer })
 
+    let data = {}
+
     websocketServer.on('connection', async (res, req) => {
         let options = {}
 
@@ -106,14 +108,12 @@ srvlight.prototype.wsStart = function() {
             }
         }
 
-        let data = {
-            host: req.headers['host'].includes(':') ? req.headers['host'].split(':')[0] : req.headers['host'],
-            uri: req.url,
-            headers: req.headers,
-            headersSize: 0,
-            ip: req.socket.remoteAddress.includes(':') ? req.socket.remoteAddress.split(':')[req.socket.remoteAddress.split(':').length - 1] : req.socket.remoteAddress,
-            ts: Date.now()
-        }
+        data.host = req.headers['host'].includes(':') ? req.headers['host'].split(':')[0] : req.headers['host']
+        data.uri = req.url
+        data.headers = req.headers
+        data.headersSize = 0
+        data.ip = req.socket.remoteAddress.includes(':') ? req.socket.remoteAddress.split(':')[req.socket.remoteAddress.split(':').length - 1] : req.socket.remoteAddress
+        data.startTs = Date.now()
 
         if (req.headers['cf-connecting-ip']) data.ip = req.headers['cf-connecting-ip']
 
