@@ -193,7 +193,8 @@ srvlight.prototype.httpStart = function() {
             bodyInFile: false,
             body: '',
             bodySize: 0,
-            ip: req.socket.remoteAddress.includes(':') ? req.socket.remoteAddress.split(':')[req.socket.remoteAddress.split(':').length - 1] : req.socket.remoteAddress
+            ip: req.socket.remoteAddress.includes(':') ? req.socket.remoteAddress.split(':')[req.socket.remoteAddress.split(':').length - 1] : req.socket.remoteAddress,
+            ts: Date.parse(Date.now())
         }
 
         if (req.headers['cf-connecting-ip']) data.ip = req.headers['cf-connecting-ip']
