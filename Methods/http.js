@@ -471,4 +471,8 @@ srvlight.prototype.httpStart = function() {
     }
     
     webServer.listen(server.options.port)
+
+    srvlight.prototype.httpStop = function() {
+        webServer.close(() => {})
+    }
 }

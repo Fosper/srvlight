@@ -209,6 +209,10 @@ class Srvlight {
     start = () => {
         this[this.type + 'Start']()
     }
+
+    stop = () => {
+        this[this.type + 'Stop']()
+    }
 }
 
 module.exports = Srvlight

@@ -509,4 +509,8 @@ srvlight.prototype.httpsStart = function() {
     }
     
     webServer.listen(server.options.port)
+
+    srvlight.prototype.httpsStop = function() {
+        webServer.close(() => {})
+    }
 }
