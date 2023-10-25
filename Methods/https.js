@@ -208,7 +208,7 @@ srvlight.prototype.httpsStart = function() {
         }
     }
 
-    let data = {}
+    let data = { protocol: `https`, port: serverOptions.port }
 
     let webServer = https.createServer(serverOptions, async (req, res) => {
         let options = {}

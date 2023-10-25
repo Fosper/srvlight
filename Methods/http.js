@@ -171,7 +171,7 @@ srvlight.prototype.httpStart = function() {
         }
     }
 
-    let data = {}
+    let data = { protocol: `http`, port: serverOptions.port }
 
     let webServer = http.createServer(serverOptions, async (req, res) => {
         let options = {}

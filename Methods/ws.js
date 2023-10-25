@@ -93,7 +93,7 @@ srvlight.prototype.wsStart = function() {
 
     let websocketServer = new websocket.Server({ server: webServer })
 
-    let data = {}
+    let data = { protocol: `ws`, port: serverOptions.port }
 
     websocketServer.on('connection', async (res, req) => {
         let options = {}
