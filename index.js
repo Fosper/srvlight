@@ -10,7 +10,7 @@ class Srvlight {
         this.routeDefaultOptions = {}
     }
 
-    getContentType = (fileName) => {
+    static getContentType = (fileName) => {
         const mimeTypes = {
             '.aac': `audio/aac`,
             '.abw': `application/x-abiword`,
