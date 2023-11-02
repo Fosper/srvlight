@@ -277,9 +277,12 @@ srvlight.prototype.httpsStart = function() {
                             try {
                                 await fs.promises.access(asset.dir + '/' + filename)
                                 let headers = {}
-                                if (filename.includes('.svg')) {
-                                    headers['Content-Type'] = 'image/svg+xml'
+
+                                const contentType = srvlight.getContentType(filename)
+                                if (contentType) {
+                                    headers['Content-Type'] = contentType
                                 }
+
                                 res.writeHead(200, headers)
                                 fs.createReadStream(asset.dir + '/' + filename).pipe(res)
                             } catch (error) {
