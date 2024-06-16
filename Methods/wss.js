@@ -152,6 +152,7 @@ srvlight.prototype.wssStart = function() {
         data.headersSize = 0
         data.ip = req.socket.remoteAddress.includes(':') ? req.socket.remoteAddress.split(':')[req.socket.remoteAddress.split(':').length - 1] : req.socket.remoteAddress
         data.startTs = Date.now()
+        data.clients = websocketServer.clients
 
         if (req.headers['cf-connecting-ip']) data.ip = req.headers['cf-connecting-ip']
 
